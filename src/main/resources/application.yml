@@ -1,0 +1,43 @@
+server:
+  port: 4000
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/bill?useUnicode=true&useSSL=false&characterEncoding=utf8&serverTimezone=Asia/Shanghai
+    username: root
+    password: Admin
+    dbcp2:
+      connection-init-sqls: set names utf8mb4
+  jackson:
+    date-format: yyyy-MM-dd HH:mm:ss
+    time-zone: GMT+8
+#    default-property-inclusion: NON_EMPTY
+  servlet:
+    multipart:
+      max-file-size: 2MB
+      max-request-size: 5MB
+logging:
+  level:
+    root: info  # 设置所有目录的日志级别
+mybatis-plus:
+#  configuration:
+#    log-impl: org.apache.ibatis.logging.sudout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: isDelete
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+      id-type: auto
+# 分页配置
+#pagehelper:
+#  helper-dialect: mysql
+#  reasonable: true
+#  support-methods-arguments: true
+#  params: count=countSql
+#logging:
+#  level:
+#    com:
+#      dvaren:
+#        blogv2:
+#          mapper: debug
