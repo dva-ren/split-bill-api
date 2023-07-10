@@ -1,5 +1,6 @@
 package com.dvaren.bill.service;
 
+import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.domain.entity.ActivityParticipants;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
@@ -12,4 +13,7 @@ import org.springframework.stereotype.Service;
 @Service
 public interface ActivityParticipantsService extends IService<ActivityParticipants> {
 
+    ActivityParticipants addParticipant(String activityId, String userId) throws ApiException;
+
+    void removeParticipant(String activityId, String userId);
 }

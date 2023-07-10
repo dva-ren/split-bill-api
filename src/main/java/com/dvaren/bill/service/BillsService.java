@@ -1,8 +1,11 @@
 package com.dvaren.bill.service;
 
+import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.domain.entity.Bills;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
+
+import java.util.List;
 
 /**
 * @author 025
@@ -11,5 +14,15 @@ import org.springframework.stereotype.Service;
 */
 @Service
 public interface BillsService extends IService<Bills> {
+
+    Bills getBill(String billId);
+
+    List<Bills> getCreatedBills(String uid);
+
+    Bills createBill(Bills bill);
+
+    Bills updateBill(Bills bill) throws ApiException;
+
+    void deleteBill(String id) throws ApiException;
 
 }

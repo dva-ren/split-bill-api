@@ -20,4 +20,7 @@ public class SystemConstants {
     // 未支付
     public static final Integer SPAM = 0;
 
+    // 权限验证字段
+    public static final String ACCESS_TOKEN = "Access_token";
+
 }

@@ -25,7 +25,9 @@ public class ResponseResult<T> {
     public static <O> ResponseResult<O> ok(O data){
         return new ResponseResult<O>(StatusCodeEnum.SUCCESS.getCode(),StatusCodeEnum.SUCCESS.getMsg(),data);
     }
-
+    public static <O> ResponseResult<O> ok(String msg, O data){
+        return new ResponseResult<O>(StatusCodeEnum.SUCCESS.getCode(),msg ,data);
+    }
     public static <O> ResponseResult<O> failed(){
         return new ResponseResult<>(StatusCodeEnum.FAILED.getCode(),StatusCodeEnum.FAILED.getMsg(),null);
     }

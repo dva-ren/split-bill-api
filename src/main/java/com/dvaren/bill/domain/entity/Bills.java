@@ -31,14 +31,20 @@ public class Bills implements Serializable {
     private String category;
 
     /**
-     * 标题
+     * 账单备注
      */
-    private String title;
+    private String remark;
 
     /**
      * 创建人ID
      */
-    private String userId;
+    private String creatorId;
+
+    /**
+     * 创建人ID
+     */
+    @TableField(exist = false)
+    private Users creator;
 
     /**
      * 活动ID

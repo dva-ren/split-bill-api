@@ -1,8 +1,12 @@
 package com.dvaren.bill.service;
 
+import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.domain.entity.Users;
 import com.baomidou.mybatisplus.extension.service.IService;
+import com.dvaren.bill.domain.vo.UserLoginVo;
 import org.springframework.stereotype.Service;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
 * @author 025
@@ -12,4 +16,11 @@ import org.springframework.stereotype.Service;
 @Service
 public interface UsersService extends IService<Users> {
 
+    Users queryUserById(String uid);
+
+    Users login(HttpServletRequest request) throws ApiException;
+
+    Users register(UserLoginVo userLoginVo) throws ApiException;
+
+    void removeUser(String uid);
 }

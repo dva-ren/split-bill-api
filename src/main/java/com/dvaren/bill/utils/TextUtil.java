@@ -1,6 +1,7 @@
 package com.dvaren.bill.utils;
 
 import java.util.Calendar;
+import java.util.List;
 
 /**
  * @description:
@@ -10,6 +11,14 @@ import java.util.Calendar;
 public class TextUtil {
     public static boolean isEmpty(String s){
         return s == null || s.isEmpty();
+    }
+    public static boolean ContainEmptyValue(List<String> args){
+        for (int i = 0; i < args.size(); i++) {
+            if( args.get(i) == null || args.get(i).isEmpty()){
+                return true;
+            }
+        }
+        return false;
     }
 
     public static String generateNickName() {

@@ -18,7 +18,7 @@ public class MyMetaObjectHandler implements MetaObjectHandler {
         if(createTime == null){
             this.setFieldValByName("createTime",new Timestamp(System.currentTimeMillis()), metaObject);
         }
-//        this.setFieldValByName("updateTime",new Timestamp(System.currentTimeMillis()),metaObject);
+        this.setFieldValByName("updateTime",new Timestamp(System.currentTimeMillis()),metaObject);
     }
 
     @Override

@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * 
  * @TableName activities
@@ -22,11 +24,18 @@ public class Activities implements Serializable {
     /**
      * 用户ID
      */
-    private String userId;
+    private String creatorId;
+
+    /**
+     * 用户信息
+     */
+    @TableField(exist = false)
+    private Users creator;
 
     /**
      * 活动名称
      */
+    @NotBlank(message = "活动名称不能为空")
     private String name;
 
     /**
