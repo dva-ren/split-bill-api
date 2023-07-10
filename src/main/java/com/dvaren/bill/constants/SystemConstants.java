@@ -2,20 +2,22 @@ package com.dvaren.bill.constants;
 
 public class SystemConstants {
 
-    // 正常状态
-    public static final Integer NORMAL = 0;
-    // 隐藏状态
+    // 固定金额
+    public static final Integer FIXED = 0;
+
+    // 不固定金额
+    public static final Integer NOT_FIXED = 1;
+
+    // 已删除
     public static final Integer HIDDEN = 1;
 
-    // 未读
+    // 未删除
     public static final Integer UNREAD = 0;
 
-    // 已读
+    // 已支付
     public static final Integer READ = 1;
 
-    // 垃圾评论
-    public static final Integer SPAM = 2;
+    // 未支付
+    public static final Integer SPAM = 0;
 
-    // 忽略状态
-    public static final Integer IGNORE = -1;
 }
