@@ -1,7 +1,7 @@
 package com.dvaren.bill.service.impl;
 
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
-import com.dvaren.bill.domain.BillParticipants;
+import com.dvaren.bill.domain.entity.BillParticipants;
 import com.dvaren.bill.service.BillParticipantsService;
 import com.dvaren.bill.mapper.BillParticipantsMapper;
 import org.springframework.stereotype.Service;

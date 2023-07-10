@@ -4,7 +4,7 @@
         "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
 <mapper namespace="com.dvaren.bill.mapper.BillItemsMapper">
 
-    <resultMap id="BaseResultMap" type="com.dvaren.bill.domain.BillItems">
+    <resultMap id="BaseResultMap" type="com.dvaren.bill.domain.entity.BillItems">
             <id property="id" column="id" jdbcType="VARCHAR"/>
             <result property="billId" column="bill_id" jdbcType="VARCHAR"/>
             <result property="title" column="title" jdbcType="VARCHAR"/>

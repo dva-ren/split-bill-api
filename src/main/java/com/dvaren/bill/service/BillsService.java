@@ -1,6 +1,6 @@
 package com.dvaren.bill.service;
 
-import com.dvaren.bill.domain.Bills;
+import com.dvaren.bill.domain.entity.Bills;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
 

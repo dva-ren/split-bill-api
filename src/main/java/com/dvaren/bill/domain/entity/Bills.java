@@ -1,4 +1,4 @@
-package com.dvaren.bill.domain;
+package com.dvaren.bill.domain.entity;
 
 import com.baomidou.mybatisplus.annotation.*;
 

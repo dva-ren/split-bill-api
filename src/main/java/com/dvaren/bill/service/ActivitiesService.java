@@ -1,6 +1,6 @@
 package com.dvaren.bill.service;
 
-import com.dvaren.bill.domain.Activities;
+import com.dvaren.bill.domain.entity.Activities;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
 
@@ -11,5 +11,6 @@ import org.springframework.stereotype.Service;
 */
 @Service
 public interface ActivitiesService extends IService<Activities> {
+
 
 }
