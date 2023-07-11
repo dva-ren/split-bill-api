@@ -52,6 +52,15 @@ public class BillParticipants implements Serializable {
     private Integer paid;
 
     /**
+     * 支付给
+     */
+    private String payToUserId;
+    /**
+     * 支付给
+     */
+    @TableField(exist = false)
+    private Users payTo;
+    /**
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)

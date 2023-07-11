@@ -171,6 +171,16 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
 
         // 所有的账单
         List<Bills> allBills = this.getActivityAllBills(activityId);
+
+        // 我创建的账单
+        List<Bills> createdBills = this.getCreatedBills(activityId);
+        List<BillParticipants> billParticipantList = new ArrayList<>();
+
+        for (Bills createdBill : createdBills) {
+            List<BillParticipants> billParticipants = participantsMapper
+                    .selectList(new LambdaQueryWrapper<BillParticipants>().eq(BillParticipants::getBillId, createdBill.getId()));
+            billParticipantList.containsAll(billParticipants);
+        }
         // 所有的参与者
         List<ActivityParticipants> participantList = activityParticipantsService.getParticipant(activityId);
 
@@ -179,9 +189,9 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
             billsMapper.selectById(participant.getUserId());
         }
 
-        for (Bills bill : allBills) {
-
-        }
+//        for (Bills bill : allBills) {
+//
+//        }
 //        participantsMapper.selectList(new LambdaQueryWrapper<BillParticipants>().eq());
 
         return null;
