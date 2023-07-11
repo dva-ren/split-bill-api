@@ -5,6 +5,8 @@ import com.baomidou.mybatisplus.annotation.*;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
 
 /**
@@ -41,10 +43,23 @@ public class Bills implements Serializable {
     private String creatorId;
 
     /**
-     * 创建人ID
+     * 创建人信息
      */
     @TableField(exist = false)
     private Users creator;
+
+    /**
+     * 参与者id数组
+     */
+    @TableField(exist = false)
+    private List<String> participantIds;
+
+    /**
+     * 参与者信息数组
+     */
+    @TableField(exist = false)
+    private List<BillParticipants> participant;
+
 
     /**
      * 活动ID

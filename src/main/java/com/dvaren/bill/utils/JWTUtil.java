@@ -44,7 +44,7 @@ public class JWTUtil {
 
         // 设置JWT令牌的过期时间为60
         Calendar instance = Calendar.getInstance();
-        instance.add(Calendar.DAY_OF_WEEK, 1);
+        instance.add(Calendar.DAY_OF_WEEK, 7);
         builder.withExpiresAt(instance.getTime());
 
         // 设置签名并返回token

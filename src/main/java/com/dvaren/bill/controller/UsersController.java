@@ -1,5 +1,6 @@
 package com.dvaren.bill.controller;
 
+import com.dvaren.bill.Annotation.IgnoreAuth;
 import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.constants.SystemConstants;
 import com.dvaren.bill.domain.entity.Users;
@@ -25,6 +26,7 @@ public class UsersController {
     private UsersService usersService;
 
     @Validated
+    @IgnoreAuth
     @PostMapping("/login")
     public ResponseResult<Object> login(@RequestBody UserLoginVo userVo, HttpServletRequest request) throws ApiException {
         String token = request.getHeader(SystemConstants.ACCESS_TOKEN);

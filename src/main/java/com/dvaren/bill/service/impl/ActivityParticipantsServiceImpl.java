@@ -6,11 +6,13 @@ import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.domain.entity.Activities;
 import com.dvaren.bill.domain.entity.ActivityParticipants;
 import com.dvaren.bill.mapper.ActivitiesMapper;
+import com.dvaren.bill.mapper.UsersMapper;
 import com.dvaren.bill.service.ActivityParticipantsService;
 import com.dvaren.bill.mapper.ActivityParticipantsMapper;
 import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
+import java.util.List;
 import java.util.Objects;
 
 /**
@@ -27,6 +29,9 @@ public class ActivityParticipantsServiceImpl extends ServiceImpl<ActivityPartici
 
     @Resource
     private ActivitiesMapper activitiesMapper;
+
+    @Resource
+    private UsersMapper usersMapper;
 
     /**
      * 向活动添加参与者
@@ -60,6 +65,17 @@ public class ActivityParticipantsServiceImpl extends ServiceImpl<ActivityPartici
     public void removeParticipant(String activityId, String userId) {
         LambdaQueryWrapper<ActivityParticipants> eq = new LambdaQueryWrapper<ActivityParticipants>().eq(ActivityParticipants::getActivityId, activityId).eq(ActivityParticipants::getUserId, userId);
         activityParticipantsMapper.delete(eq);
+    }
+
+    @Override
+    public List<ActivityParticipants> getParticipant(String activityId) {
+        List<ActivityParticipants> participantsList = activityParticipantsMapper
+                .selectList(new LambdaQueryWrapper<ActivityParticipants>().eq(ActivityParticipants::getActivityId, activityId));
+
+        for (ActivityParticipants participants : participantsList) {
+            participants.setUser(usersMapper.selectById(participants.getUserId()));
+        }
+        return participantsList;
     }
 }
 

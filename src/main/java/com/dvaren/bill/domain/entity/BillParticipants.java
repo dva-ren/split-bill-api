@@ -31,6 +31,12 @@ public class BillParticipants implements Serializable {
     private String userId;
 
     /**
+     * 用户信息
+     */
+    @TableField(exist = false)
+    private Users user;
+
+    /**
      * 分摊金额
      */
     private BigDecimal splitMoney;

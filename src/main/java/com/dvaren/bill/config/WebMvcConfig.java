@@ -19,7 +19,7 @@ public class WebMvcConfig implements WebMvcConfigurer {
      */
     @Bean
     public HandlerInterceptor getUserLoginInterceptor(){
-        return new LogInterceptor();
+        return new UserLoginInterceptor();
     }
 
     /**

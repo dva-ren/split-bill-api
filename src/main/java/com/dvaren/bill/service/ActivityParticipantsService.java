@@ -5,6 +5,8 @@ import com.dvaren.bill.domain.entity.ActivityParticipants;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 /**
 * @author 025
 * @description 针对表【activity_participants】的数据库操作Service
@@ -16,4 +18,6 @@ public interface ActivityParticipantsService extends IService<ActivityParticipan
     ActivityParticipants addParticipant(String activityId, String userId) throws ApiException;
 
     void removeParticipant(String activityId, String userId);
+
+    List<ActivityParticipants> getParticipant(String activityId);
 }

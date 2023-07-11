@@ -30,6 +30,12 @@ public class ActivityParticipants implements Serializable {
     private String userId;
 
     /**
+     * 用户信息
+     */
+    @TableField(exist = false)
+    private Users user;
+
+    /**
      * 创建时间
      */
     @TableField(fill = FieldFill.INSERT)

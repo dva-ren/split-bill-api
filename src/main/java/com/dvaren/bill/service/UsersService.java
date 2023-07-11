@@ -7,6 +7,8 @@ import com.dvaren.bill.domain.vo.UserLoginVo;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
+import java.util.Objects;
 
 /**
 * @author 025
@@ -23,4 +25,5 @@ public interface UsersService extends IService<Users> {
     Users register(UserLoginVo userLoginVo) throws ApiException;
 
     void removeUser(String uid);
+
 }
