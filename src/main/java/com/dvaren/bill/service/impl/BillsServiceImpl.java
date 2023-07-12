@@ -3,14 +3,10 @@ package com.dvaren.bill.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dvaren.bill.config.ApiException;
-import com.dvaren.bill.constants.SystemConstants;
 import com.dvaren.bill.domain.dto.BillInfoDto;
 import com.dvaren.bill.domain.entity.*;
-import com.dvaren.bill.mapper.ActivitiesMapper;
-import com.dvaren.bill.mapper.BillParticipantsMapper;
-import com.dvaren.bill.mapper.UsersMapper;
+import com.dvaren.bill.mapper.*;
 import com.dvaren.bill.service.BillsService;
-import com.dvaren.bill.mapper.BillsMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +32,9 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
 
     @Resource
     private ActivitiesMapper activitiesMapper;
+
+    @Resource
+    private ActivityParticipantsMapper activityParticipantsMapper;
 
     @Resource
     private UsersMapper usersMapper;
@@ -145,6 +144,10 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
             Users users = usersMapper.selectById(userId);
             if(users == null){
                 throw new ApiException("用户不存在->"+userId);
+            }
+            ActivityParticipants participants = activityParticipantsMapper.selectOne(new LambdaQueryWrapper<ActivityParticipants>().eq(ActivityParticipants::getActivityId, bill.getActivityId()));
+            if(participants == null){
+                throw new ApiException("该成员不在此活动中,id=" + userId);
             }
             BillParticipants billParticipants = new BillParticipants();
             billParticipants.setBillId(bill.getId());
