@@ -24,4 +24,6 @@ public interface BillParticipantsService extends IService<BillParticipants> {
     List<BillParticipants> getsBillParticipantList(String userId);
 
     BillParticipants getBillParticipant(String id);
+
+    void checkoutBills(List<String> billIds) throws ApiException;
 }

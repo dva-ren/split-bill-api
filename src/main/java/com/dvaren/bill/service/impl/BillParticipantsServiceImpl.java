@@ -3,10 +3,12 @@ package com.dvaren.bill.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dvaren.bill.config.ApiException;
+import com.dvaren.bill.constants.SystemConstants;
 import com.dvaren.bill.domain.entity.BillParticipants;
 import com.dvaren.bill.service.BillParticipantsService;
 import com.dvaren.bill.mapper.BillParticipantsMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.util.List;
@@ -52,6 +54,20 @@ public class BillParticipantsServiceImpl extends ServiceImpl<BillParticipantsMap
     @Override
     public BillParticipants getBillParticipant(String id) {
         return participantsMapper.selectById(id);
+    }
+
+    @Override
+    @Transactional(rollbackFor = {ApiException.class})
+    public void checkoutBills(List<String> billIds) throws ApiException {
+        for (String billId : billIds) {
+            BillParticipants billParticipants = new BillParticipants();
+            billParticipants.setId(billId);
+            billParticipants.setPaid(SystemConstants.PAID);
+            int i = participantsMapper.updateById(billParticipants);
+            if(i<0){
+                throw new ApiException("结算出错,id="+billId);
+            }
+        }
     }
 }
 

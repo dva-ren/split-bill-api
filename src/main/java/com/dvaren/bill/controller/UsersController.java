@@ -45,4 +45,15 @@ public class UsersController {
         res.put("access_token",JWTUtil.generateToken(payload));
         return ResponseResult.ok(res);
     }
+
+    @IgnoreAuth
+    @GetMapping("/token")
+    public ResponseResult<Object> token(@RequestParam("id") String uid){
+        // 生成token
+        Map<String, String> payload = new HashMap<>();
+        payload.put("id",uid);
+        HashMap<String, Object> res = new HashMap<>();
+        res.put("access_token",JWTUtil.generateToken(payload));
+        return ResponseResult.ok(res);
+    }
 }

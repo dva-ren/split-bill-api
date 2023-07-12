@@ -2,6 +2,7 @@ package com.dvaren.bill.domain.dto;
 
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.dvaren.bill.domain.entity.Bills;
+import com.dvaren.bill.domain.entity.Users;
 import lombok.Data;
 
 import java.math.BigDecimal;
@@ -13,12 +14,10 @@ public class BillInfoDto {
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
-    private List<Bills> expendBills;
+    private List<Bills> bills;
 
-    private List<Bills> incomeBills;
+    private Users user;
 
-    private BigDecimal expendMoney;
-
-    private BigDecimal incomeMoney;
+    private BigDecimal totalAmount;
 
 }

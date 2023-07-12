@@ -9,16 +9,16 @@ public class SystemConstants {
     public static final Integer NOT_FIXED = 1;
 
     // 已删除
-    public static final Integer HIDDEN = 1;
+    public static final Integer DELETED = 1;
 
     // 未删除
-    public static final Integer UNREAD = 0;
+    public static final Integer NORMAL = 0;
 
     // 已支付
-    public static final Integer READ = 1;
+    public static final Integer PAID = 1;
 
     // 未支付
-    public static final Integer SPAM = 0;
+    public static final Integer UN_PAID = 0;
 
     // 权限验证字段
     public static final String ACCESS_TOKEN = "Access_token";

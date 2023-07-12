@@ -3,12 +3,12 @@ package com.dvaren.bill.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dvaren.bill.config.ApiException;
+import com.dvaren.bill.constants.SystemConstants;
 import com.dvaren.bill.domain.dto.BillInfoDto;
 import com.dvaren.bill.domain.entity.*;
 import com.dvaren.bill.mapper.ActivitiesMapper;
 import com.dvaren.bill.mapper.BillParticipantsMapper;
 import com.dvaren.bill.mapper.UsersMapper;
-import com.dvaren.bill.service.ActivityParticipantsService;
 import com.dvaren.bill.service.BillsService;
 import com.dvaren.bill.mapper.BillsMapper;
 import org.springframework.stereotype.Service;
@@ -16,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.*;
 
 /**
@@ -39,9 +40,11 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
     @Resource
     private UsersMapper usersMapper;
 
-    @Resource
-    private ActivityParticipantsService activityParticipantsService;
-
+    /**
+     * 获取账单信息
+     * @param billId 账单id
+     * @return 账单信息
+     */
     @Override
     public Bills getBill(String billId) {
         Bills bills = billsMapper.selectById(billId);
@@ -49,23 +52,45 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
         return bills;
     }
 
+    /**
+     * 获取我创建的账单
+     * @param uid 用户id
+     * @return 账单列表
+     */
     @Override
-    public List<Bills> getCreatedBills(String uid) {
+    public List<Bills> getCreatedBills(String uid, String activityId,Integer state) {
         Users user = usersMapper.selectById(uid);
-        List<Bills> bills = billsMapper.selectList(new LambdaQueryWrapper<Bills>().eq(Bills::getCreatorId, uid));
+        List<Bills> bills = billsMapper
+                .selectList(new LambdaQueryWrapper<Bills>()
+                        .eq(Bills::getCreatorId, uid)
+                        .eq(Bills::getActivityId,activityId)
+                        .orderByDesc(Bills::getCreateTime));
         for (Bills bill : bills) {
             bill.setCreator(user);
+            bill.setParticipant(participantsMapper
+                    .selectList(new LambdaQueryWrapper<BillParticipants>()
+                            .eq(BillParticipants::getBillId, bill.getId())
+                            .eq(BillParticipants::getPaid,state)));
         }
         return bills;
     }
 
+    /**
+     * 获取和我有关的账单
+     * @param uid 用户id
+     * @return 账单列表
+     */
     @Override
-    public List<Bills> getAboutMeBills(String uid) {
+    public List<Bills> getAboutMeBills(String uid, String activityId, Integer state) {
+        // TODO: 逻辑有问题
         List<Bills> list = new ArrayList<>();
         List<String> billIds = new ArrayList<>();
 
         List<BillParticipants> billParticipants = participantsMapper
-                .selectList(new LambdaQueryWrapper<BillParticipants>().eq(BillParticipants::getUserId, uid).orderByDesc(BillParticipants::getCreateTime));
+                .selectList(new LambdaQueryWrapper<BillParticipants>()
+                        .eq(BillParticipants::getUserId, uid)
+                        .eq(BillParticipants::getPaid, state)
+                        .orderByDesc(BillParticipants::getCreateTime));
 
         for (BillParticipants participant : billParticipants) {
             participant.setUser(usersMapper.selectById(participant.getUserId()));
@@ -92,6 +117,12 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
         return list;
     }
 
+    /**
+     * 创建账单
+     * @param bill 账单实体
+     * @return 添加后的结果
+     * @throws ApiException 参数错误
+     */
     @Override
     @Transactional(rollbackFor = {ApiException.class})
     public Bills createBill(Bills bill) throws ApiException {
@@ -106,7 +137,7 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
             throw new ApiException("participant参数错误");
         }
         BigDecimal len = new BigDecimal(bill.getParticipantIds().size());
-        BigDecimal splitMoney = bill.getMoney().divide(len,2);
+        BigDecimal splitMoney = bill.getMoney().divide(len, RoundingMode.CEILING);
         for (String userId : bill.getParticipantIds()) {
             if(Objects.equals(bill.getCreatorId(), userId)){
                 continue;
@@ -118,13 +149,20 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
             BillParticipants billParticipants = new BillParticipants();
             billParticipants.setBillId(bill.getId());
             billParticipants.setUserId(userId);
-            // TODO: 分割金额处理   分割不均
+            // TODO: 分割金额处理   分割可能不均
             billParticipants.setSplitMoney(splitMoney);
+            billParticipants.setPayToUserId(bill.getCreatorId());
             participantsMapper.insert(billParticipants);
         }
         return bill;
     }
 
+    /**
+     * 更新账单
+     * @param bill 账单实体
+     * @return 更新后的账单实体
+     * @throws ApiException api异常
+     */
     @Override
     public Bills updateBill(Bills bill) throws ApiException {
         int i = billsMapper.updateById(bill);
@@ -134,6 +172,11 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
         return bill;
     }
 
+    /**
+     * 删除账单
+     * @param id 账单id
+     * @throws ApiException api异常
+     */
     @Override
     public void deleteBill(String id) throws ApiException {
         int i = billsMapper.deleteById(id);
@@ -142,6 +185,11 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
         }
     }
 
+    /**
+     * 获取指定活动的所有账单
+     * @param activityId 活动id
+     * @return 账单列表
+     */
     @Override
     public List<Bills> getActivityAllBills(String activityId) {
         List<Bills> bills = billsMapper.selectList(new LambdaQueryWrapper<Bills>().eq(Bills::getActivityId, activityId));
@@ -155,46 +203,72 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
     }
 
     /**
-     *
-     * @param activityId
-     * @return
-     * [
-     *      {
-     *          user: Users,
-     *          bill: Participant
-     *          money: Integer
-     *      }
-     * ]
+     * 统计支付给我的
+     * @param activityId 活动id
+     * @return 结果数组
      */
     @Override
-    public BillInfoDto getTotalMoney(String activityId) {
+    public List<BillInfoDto> getIncomeTotalMoney(String uid, String activityId, Integer state) {
+        List<Bills> createdBills = this.getCreatedBills(uid, activityId,state);
+        return this.toBillInfoDto(createdBills,state);
+    }
 
-        // 所有的账单
-        List<Bills> allBills = this.getActivityAllBills(activityId);
+    /**
+     * 统计支付给别人的
+     * @param uid 自己的id
+     * @param activityId 活动id
+     * @return 结果数组
+     */
+    @Override
+    public List<BillInfoDto> getExpendTotalMoney(String uid, String activityId, Integer state) {
+        List<Bills> aboutMeBills = this.getAboutMeBills(uid, activityId,state);
+        return this.toBillInfoDto(aboutMeBills,state);
+    }
 
-        // 我创建的账单
-        List<Bills> createdBills = this.getCreatedBills(activityId);
-        List<BillParticipants> billParticipantList = new ArrayList<>();
+    /**
+     * 转换为BIllInfoDto
+     * @param billsList 账单列表
+     * @return 结果数组
+     */
+    public List<BillInfoDto> toBillInfoDto(List<Bills> billsList, Integer state){
+        Map<Users, BigDecimal> decimalMap = new HashMap<>();
+        Map<String, Users> usersMap = new HashMap<>();
+        Map<String, List<Bills>> userBillMap = new HashMap<>();
 
-        for (Bills createdBill : createdBills) {
-            List<BillParticipants> billParticipants = participantsMapper
-                    .selectList(new LambdaQueryWrapper<BillParticipants>().eq(BillParticipants::getBillId, createdBill.getId()));
-            billParticipantList.containsAll(billParticipants);
+        for (Bills bill : billsList) {
+            List<BillParticipants> billParticipants = participantsMapper.selectList(new LambdaQueryWrapper<BillParticipants>()
+                    .eq(BillParticipants::getBillId, bill.getId())
+                    .eq(BillParticipants::getPaid, state));
+            for (BillParticipants billParticipant : billParticipants) {
+                Users user = usersMap.get(billParticipant.getUserId());
+                if(user == null){
+                    user = usersMapper.selectById(billParticipant.getUserId());
+                    usersMap.put(billParticipant.getUserId(), user);
+                }
+                BigDecimal bigDecimal = decimalMap.get(user);
+                if(bigDecimal == null){
+                    bigDecimal = billParticipant.getSplitMoney();
+                    decimalMap.put(user, bigDecimal);
+                }
+                else{
+                    bigDecimal = bigDecimal.add(billParticipant.getSplitMoney());
+                }
+                decimalMap.put(user,bigDecimal);
+                List<Bills> bills = userBillMap.computeIfAbsent(billParticipant.getUserId(), k -> new ArrayList<>());
+                bills.add(bill);
+            }
         }
-        // 所有的参与者
-        List<ActivityParticipants> participantList = activityParticipantsService.getParticipant(activityId);
 
+        List<BillInfoDto> res = new ArrayList<>();
 
-        for (ActivityParticipants participant : participantList) {
-            billsMapper.selectById(participant.getUserId());
+        for (Users user : decimalMap.keySet()) {
+            BillInfoDto billInfoDto = new BillInfoDto();
+            billInfoDto.setBills(userBillMap.get(user.getId()));
+            billInfoDto.setUser(user);
+            billInfoDto.setTotalAmount(decimalMap.get(user));
+            res.add(billInfoDto);
         }
-
-//        for (Bills bill : allBills) {
-//
-//        }
-//        participantsMapper.selectList(new LambdaQueryWrapper<BillParticipants>().eq());
-
-        return null;
+        return res;
     }
 }
 

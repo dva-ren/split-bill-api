@@ -1,6 +1,7 @@
 package com.dvaren.bill.service;
 
 import com.dvaren.bill.config.ApiException;
+import com.dvaren.bill.constants.SystemConstants;
 import com.dvaren.bill.domain.dto.BillInfoDto;
 import com.dvaren.bill.domain.entity.Bills;
 import com.baomidou.mybatisplus.extension.service.IService;
@@ -18,9 +19,9 @@ public interface BillsService extends IService<Bills> {
 
     Bills getBill(String billId);
 
-    List<Bills> getCreatedBills(String uid);
+    List<Bills> getCreatedBills(String uid, String activityId, Integer state);
 
-    List<Bills> getAboutMeBills(String uid);
+    List<Bills> getAboutMeBills(String uid, String activityId, Integer state);
 
     Bills createBill(Bills bill) throws ApiException;
 
@@ -30,5 +31,8 @@ public interface BillsService extends IService<Bills> {
 
     List<Bills> getActivityAllBills(String activityId);
 
-    BillInfoDto getTotalMoney(String activityId);
+    List<BillInfoDto> getIncomeTotalMoney(String uid, String activityId, Integer state);
+
+    List<BillInfoDto> getExpendTotalMoney(String uid, String activityId, Integer state);
+
 }
