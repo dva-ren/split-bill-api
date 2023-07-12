@@ -30,8 +30,8 @@ mybatis-plus:
       logic-not-delete-value: 0
       id-type: auto
 weixin:
-  appid: wx2492e9f33bbd9555
-  secret: 519fea9790b85fef6f0cd28f3d4cade9
+  appid: ${APPID}
+  secret: ${SECRET}
 
 # 分页配置
 #pagehelper:
