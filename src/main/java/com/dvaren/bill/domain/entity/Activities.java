@@ -22,7 +22,7 @@ public class Activities implements Serializable {
     private String id;
 
     /**
-     * 用户ID
+     * 创建者ID
      */
     private String creatorId;
 

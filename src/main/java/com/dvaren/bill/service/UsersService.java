@@ -18,7 +18,7 @@ import java.util.Objects;
 @Service
 public interface UsersService extends IService<Users> {
 
-    Users queryUserById(String uid);
+    Users queryUserById(String uid) throws ApiException;
 
     Users login(HttpServletRequest request) throws ApiException;
 
@@ -26,4 +26,5 @@ public interface UsersService extends IService<Users> {
 
     void removeUser(String uid);
 
+    Users updateUser(Users user) throws ApiException;
 }

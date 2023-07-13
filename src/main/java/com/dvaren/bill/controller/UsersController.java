@@ -56,4 +56,20 @@ public class UsersController {
         res.put("access_token",JWTUtil.generateToken(payload));
         return ResponseResult.ok(res);
     }
+
+    @GetMapping
+    public ResponseResult<Object> userInfo(@RequestParam(value = "id", defaultValue = "")String uid, HttpServletRequest request) throws ApiException {
+        if(TextUtil.isEmpty(uid)){
+            uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
+        }
+        return ResponseResult.ok(usersService.queryUserById(uid));
+    }
+
+    @PutMapping
+    public ResponseResult<Object> user(@RequestBody Users user ,HttpServletRequest request) throws ApiException {
+        String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
+        user.setId(uid);
+        usersService.updateUser(user);
+        return ResponseResult.ok();
+    }
 }

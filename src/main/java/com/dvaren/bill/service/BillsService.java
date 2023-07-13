@@ -35,4 +35,7 @@ public interface BillsService extends IService<Bills> {
 
     List<BillInfoDto> getExpendTotalMoney(String uid, String activityId, Integer state);
 
+    Boolean allBillIChecked(String activityId);
+
+    List<Bills> queryBills(List<String> billIds);
 }

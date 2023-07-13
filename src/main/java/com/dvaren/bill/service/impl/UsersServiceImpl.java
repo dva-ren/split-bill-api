@@ -1,6 +1,5 @@
 package com.dvaren.bill.service.impl;
 
-import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.constants.SystemConstants;
@@ -10,7 +9,7 @@ import com.dvaren.bill.service.UsersService;
 import com.dvaren.bill.mapper.UsersMapper;
 import com.dvaren.bill.utils.JWTUtil;
 import com.dvaren.bill.utils.RestUtil;
-import lombok.extern.log4j.Log4j;
+import com.dvaren.bill.utils.TextUtil;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
@@ -18,6 +17,7 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.util.Arrays;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -49,8 +49,13 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     private UsersMapper usersMapper;
 
     @Override
-    public Users queryUserById(String uid) {
-        return usersMapper.selectById(uid);
+    public Users queryUserById(String uid) throws ApiException {
+        Users user = usersMapper.selectById(uid);
+        if(user == null){
+            throw new ApiException("用户不存在");
+        }
+
+        return user;
     }
 
     @Override
@@ -77,6 +82,15 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     @Override
     public void removeUser(String uid) {
 
+    }
+
+    @Override
+    public Users updateUser(Users user) throws ApiException {
+        if(!TextUtil.containEmptyValue(Arrays.asList(user.getNickname(),user.getAvatar(),user.getId()))){
+            throw new ApiException("参数错误");
+        }
+        usersMapper.updateById(user);
+        return user;
     }
 
     private String getOpenId(String code) throws ApiException {

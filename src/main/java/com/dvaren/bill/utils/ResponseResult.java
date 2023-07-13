@@ -31,5 +31,7 @@ public class ResponseResult<T> {
     public static <O> ResponseResult<O> failed(){
         return new ResponseResult<>(StatusCodeEnum.FAILED.getCode(),StatusCodeEnum.FAILED.getMsg(),null);
     }
-
+    public static <O> ResponseResult<O> failed(String msg){
+        return new ResponseResult<>(StatusCodeEnum.FAILED.getCode(),msg,null);
+    }
 }

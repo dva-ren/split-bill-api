@@ -23,5 +23,4 @@ public interface BillItemsService extends IService<BillItems> {
     BillItems updateBill(BillItems billItems);
 
     void deleteBill(String id);
-
 }

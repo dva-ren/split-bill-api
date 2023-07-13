@@ -2,6 +2,7 @@ package com.dvaren.bill.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.domain.entity.Activities;
 import com.dvaren.bill.domain.entity.ActivityParticipants;
 import com.dvaren.bill.domain.entity.Users;
@@ -9,13 +10,12 @@ import com.dvaren.bill.mapper.ActivityParticipantsMapper;
 import com.dvaren.bill.mapper.UsersMapper;
 import com.dvaren.bill.service.ActivitiesService;
 import com.dvaren.bill.mapper.ActivitiesMapper;
+import com.dvaren.bill.service.BillsService;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.Resource;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
 * @author 025
@@ -35,21 +35,29 @@ public class ActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Activit
     @Resource
     private UsersMapper usersMapper;
 
+    @Resource
+    private BillsService billsService;
+
     /**
      * 创建活动
-     * @param activities
-     * @return
+     * @param activities 活动实体
+     * @return 添加后的结果
      */
     @Override
+    @Transactional(rollbackFor = {Exception.class})
     public Activities createActivity(Activities activities) {
         activitiesMapper.insert(activities);
+        ActivityParticipants activityParticipants = new ActivityParticipants();
+        activityParticipants.setActivityId(activities.getId());
+        activityParticipants.setUserId(activities.getCreatorId());
+        participantsMapper.insert(activityParticipants);
         return activities;
     }
 
     /**
      * 获取我加入的活动
      * @param uid 用户id
-     * @return
+     * @return 活动列表
      */
     @Override
     public List<Activities> getsJoinActivities(String uid) {
@@ -72,31 +80,58 @@ public class ActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Activit
 
     /**
      * 获取我创建的活动
-     * @param uid
-     * @return
+     * @param uid 创建者id
+     * @return 活动列表
      */
     @Override
     public List<Activities> getsTheCreatedActivities(String uid) {
-        Map<String, Users> usersMap = new HashMap<>();
         List<Activities> users = activitiesMapper.selectList(new LambdaQueryWrapper<Activities>().eq(Activities::getCreatorId, uid));
-        for (Activities activities : users) {
-            Users user = usersMap.get(activities.getCreatorId());
-            if(user == null){
-                user = usersMapper.selectById(activities.getCreatorId());
-                usersMap.put(activities.getId(),user);
-            }
-            activities.setCreator(user);
-        }
+        this.setCreator(users);
         return users;
     }
     /**
      * 解散活动
-     * @param activityId
+     * @param activityId 活动id
      */
     @Override
-    public void dissolutionActivity(String activityId) {
-        participantsMapper.delete(new LambdaQueryWrapper<ActivityParticipants>().eq(ActivityParticipants::getActivityId,activityId));
-        activitiesMapper.delete(new LambdaQueryWrapper<Activities>().eq(Activities::getId,activityId));
+    public void dissolutionActivity(String activityId, String uid) throws ApiException {
+        Activities activities = activitiesMapper.selectById(activityId);
+        if(activities == null){
+            throw new ApiException("活动不存在");
+        }
+        if(!Objects.equals(activities.getCreatorId(), uid)){
+            throw new ApiException("权限不足");
+        }
+        // TODO: 解散前需要判断账单是否都结算完
+        if(!billsService.allBillIChecked(activityId)){
+            throw new ApiException("还有账单未结算");
+        }
+        participantsMapper.delete(new LambdaQueryWrapper<ActivityParticipants>().eq(ActivityParticipants::getActivityId, activityId));
+        activitiesMapper.deleteById(activityId);
+    }
+
+    @Override
+    public List<Activities> getsActivities(String uid) {
+
+        return null;
+    }
+
+    /**
+     * 查询创建者谢谢
+     * @param activities 原始数据
+     * @return 添加后的数据
+     */
+    public List<Activities> setCreator(List<Activities> activities){
+        Map<String, Users> usersMap = new HashMap<>();
+        for (Activities activity : activities) {
+            Users user = usersMap.get(activity.getCreatorId());
+            if(user == null){
+                user = usersMapper.selectById(activity.getCreatorId());
+                usersMap.put(activity.getId(),user);
+            }
+            activity.setCreator(user);
+        }
+        return activities;
     }
 }
 

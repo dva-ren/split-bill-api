@@ -41,7 +41,7 @@ public class BillController {
     }
 
     @PostMapping
-    public ResponseResult<Object> bill(@RequestBody Bills bills, HttpServletRequest request) throws ApiException {
+    public ResponseResult<Object> createBill(@RequestBody Bills bills, HttpServletRequest request) throws ApiException {
         String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
         bills.setCreatorId(uid);
         billsService.createBill(bills);
@@ -50,7 +50,7 @@ public class BillController {
 
     @GetMapping("/total")
     public ResponseResult<Object> billTotal(
-            @RequestParam(value = "activityId",defaultValue = "") String activityId,
+                @RequestParam(value = "activityId",defaultValue = "") String activityId,
             @RequestParam(value = "type",defaultValue = "") String type,
             HttpServletRequest request) throws ApiException {
         Object res = null;
@@ -74,5 +74,10 @@ public class BillController {
         // String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
         participantsService.checkoutBills(ids);
         return ResponseResult.ok("结算成功",null);
+    }
+    @GetMapping("/query")
+    public ResponseResult<Object> queryBills(@RequestParam("ids")List<String> ids) throws ApiException {
+        List<Bills> bills = billsService.queryBills(ids);
+        return ResponseResult.ok(bills);
     }
 }

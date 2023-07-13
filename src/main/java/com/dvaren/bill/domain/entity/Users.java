@@ -6,6 +6,8 @@ import java.io.Serializable;
 import java.util.Date;
 import lombok.Data;
 
+import javax.validation.constraints.NotBlank;
+
 /**
  * 
  * @TableName users
@@ -22,11 +24,13 @@ public class Users implements Serializable {
     /**
      * 
      */
+    @NotBlank(message = "昵称不能为空")
     private String nickname;
 
     /**
      * 
      */
+    @NotBlank(message = "头像不能为空")
     private String avatar;
 
     /**

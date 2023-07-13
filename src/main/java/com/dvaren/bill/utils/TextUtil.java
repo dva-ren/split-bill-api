@@ -12,7 +12,7 @@ public class TextUtil {
     public static boolean isEmpty(String s){
         return s == null || s.isEmpty();
     }
-    public static boolean ContainEmptyValue(List<String> args){
+    public static boolean containEmptyValue(List<String> args){
         for (int i = 0; i < args.size(); i++) {
             if( args.get(i) == null || args.get(i).isEmpty()){
                 return true;

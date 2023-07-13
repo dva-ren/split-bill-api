@@ -42,12 +42,14 @@ public class ActivityParticipantsServiceImpl extends ServiceImpl<ActivityPartici
      */
     @Override
     public ActivityParticipants addParticipant(String activityId, String userId) throws ApiException {
-        Activities activity = activitiesMapper.selectById(activityId);
-        if(activity == null){
+        Activities activities = activitiesMapper.selectById(activityId);
+        if(activities == null){
             throw new ApiException("活动不存在");
         }
-        if(Objects.equals(activity.getCreatorId(), userId)){
-            throw new ApiException("不能加入自己创建的活动");
+        ActivityParticipants participant = activityParticipantsMapper.selectOne(new LambdaQueryWrapper<ActivityParticipants>().eq(ActivityParticipants::getUserId, userId));
+
+        if(participant != null){
+            throw new ApiException("已在该活动中");
         }
         ActivityParticipants activityParticipants = new ActivityParticipants();
         activityParticipants.setActivityId(activityId);
@@ -58,8 +60,8 @@ public class ActivityParticipantsServiceImpl extends ServiceImpl<ActivityPartici
 
     /**
      * 移除参与者
-     * @param activityId
-     * @param userId
+     * @param activityId 活动id
+     * @param userId 用户id
      */
     @Override
     public void removeParticipant(String activityId, String userId) {

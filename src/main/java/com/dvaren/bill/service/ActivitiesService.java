@@ -1,5 +1,6 @@
 package com.dvaren.bill.service;
 
+import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.domain.entity.Activities;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public interface ActivitiesService extends IService<Activities> {
 
     List<Activities> getsJoinActivities(String uid);
 
-    void dissolutionActivity(String id);
+    void dissolutionActivity(String activityId, String uid) throws ApiException;
 
+    List<Activities> getsActivities(String uid);
 }

@@ -38,6 +38,11 @@ public class Bills implements Serializable {
     private String remark;
 
     /**
+     * 账单时间
+     */
+    private Date date;
+
+    /**
      * 创建人ID
      */
     private String creatorId;

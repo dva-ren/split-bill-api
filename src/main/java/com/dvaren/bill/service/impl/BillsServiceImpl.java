@@ -3,9 +3,12 @@ package com.dvaren.bill.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dvaren.bill.config.ApiException;
+import com.dvaren.bill.constants.SystemConstants;
 import com.dvaren.bill.domain.dto.BillInfoDto;
 import com.dvaren.bill.domain.entity.*;
 import com.dvaren.bill.mapper.*;
+import com.dvaren.bill.service.ActivityParticipantsService;
+import com.dvaren.bill.service.BillParticipantsService;
 import com.dvaren.bill.service.BillsService;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -37,6 +40,10 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
     private ActivityParticipantsMapper activityParticipantsMapper;
 
     @Resource
+    private BillParticipantsService billParticipantsService;
+
+
+    @Resource
     private UsersMapper usersMapper;
 
     /**
@@ -48,6 +55,7 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
     public Bills getBill(String billId) {
         Bills bills = billsMapper.selectById(billId);
         bills.setCreator(usersMapper.selectById(bills.getCreatorId()));
+        bills.setParticipant(billParticipantsService.getsBillParticipantList(billId));
         return bills;
     }
 
@@ -226,6 +234,30 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
     public List<BillInfoDto> getExpendTotalMoney(String uid, String activityId, Integer state) {
         List<Bills> aboutMeBills = this.getAboutMeBills(uid, activityId,state);
         return this.toBillInfoDto(aboutMeBills,state);
+    }
+
+    @Override
+    public Boolean allBillIChecked(String activityId) {
+        List<Bills> bills = billsMapper.selectList(new LambdaQueryWrapper<Bills>().eq(Bills::getActivityId, activityId));
+        for (Bills bill : bills) {
+            List<BillParticipants> billParticipants = participantsMapper
+                    .selectList(new LambdaQueryWrapper<BillParticipants>()
+                            .eq(BillParticipants::getBillId, bill.getId())
+                            .eq(BillParticipants::getPaid, SystemConstants.UN_PAID));
+            if(billParticipants.size() != 0){
+                return false;
+            }
+        }
+        return true;
+    }
+
+    @Override
+    public List<Bills> queryBills(List<String> billIds) {
+        List<Bills> bills = new ArrayList<>();
+        for (String billId : billIds) {
+            bills.add(this.getBill(billId));
+        }
+        return bills;
     }
 
     /**
