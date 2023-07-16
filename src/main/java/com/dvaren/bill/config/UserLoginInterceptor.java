@@ -5,7 +5,6 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.dvaren.bill.Annotation.IgnoreAuth;
 import com.dvaren.bill.constants.SystemConstants;
-import com.dvaren.bill.enums.StatusCodeEnum;
 import com.dvaren.bill.service.UsersService;
 import com.dvaren.bill.utils.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -36,7 +35,6 @@ public class UserLoginInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(@NotNull HttpServletRequest request, @NotNull HttpServletResponse response, @NotNull Object handler) throws Exception {
-//        logger.info("验证权限");
         //验证是否有忽略验证注解
         IgnoreAuth annotation;
         //验证是否有需要管理员权限注解

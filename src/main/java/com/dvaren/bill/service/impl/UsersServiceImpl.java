@@ -1,5 +1,6 @@
 package com.dvaren.bill.service.impl;
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.constants.SystemConstants;
@@ -59,9 +60,8 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
     }
 
     @Override
-    public Users login(HttpServletRequest request) throws ApiException {
-        String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
-        return usersMapper.selectById(uid);
+    public Users login(UserLoginVo userVo) throws ApiException {
+        return this.register(userVo);
     }
 
     @Override
@@ -70,13 +70,16 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
         if(openId == null){
             throw new ApiException("open_id查询失败");
         }
-        Users users = new Users();
-        users.setAvatar(userLoginVo.getAvatar());
-        users.setNickname(userLoginVo.getNickname());
-        users.setNickname(userLoginVo.getNickname());
-        users.setOpenId(openId);
-        usersMapper.insert(users);
-        return users;
+        Users user = usersMapper.selectOne(new LambdaQueryWrapper<Users>().eq(Users::getOpenId, openId));
+        if(user == null){
+            user = new Users();
+            user.setAvatar(userLoginVo.getAvatar());
+            user.setNickname(userLoginVo.getNickname());
+            user.setNickname(userLoginVo.getNickname());
+            user.setOpenId(openId);
+            usersMapper.insert(user);
+        }
+        return user;
     }
 
     @Override
@@ -103,7 +106,6 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
             Matcher errorRes = errorReg.matcher(res);
             Matcher idRes = resReg.matcher(res);
             if(errorRes.find()){
-                System.out.println(errorRes.group(1));
                 return null;
             }
             else if (idRes.find()){

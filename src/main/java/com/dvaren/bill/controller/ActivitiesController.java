@@ -49,18 +49,25 @@ public class ActivitiesController {
         return ResponseResult.ok(res);
     }
 
-    @PostMapping("/join")
-    public ResponseResult<Object> participateActivities(@NotBlank(message = "活动id不能为空") @RequestParam("activityId") String activityId, HttpServletRequest request) throws ApiException {
+    @PostMapping("/join/{activityId}")
+    public ResponseResult<Object> participateActivities(@NotBlank(message = "活动id不能为空") @PathVariable("activityId") String activityId, HttpServletRequest request) throws ApiException {
         String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
         participantsService.addParticipant(activityId,uid);
         return ResponseResult.ok("加入成功",null);
     }
 
-    @PostMapping("/dissolution")
-    public ResponseResult<Object> dissolutionActivity(@NotBlank(message = "活动id不能为空") @RequestParam("activityId") String activityId, HttpServletRequest request) throws ApiException {
+    @PostMapping("/dissolution/{activityId}")
+    public ResponseResult<Object> dissolutionActivity(@NotBlank(message = "活动id不能为空") @PathVariable("activityId") String activityId, HttpServletRequest request) throws ApiException {
         String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
         activitiesService.dissolutionActivity(activityId,uid);
-        return ResponseResult.ok("解散活动成功",null);
+        return ResponseResult.ok("解散成功",null);
+    }
+
+    @PostMapping("/exit/{activityId}")
+    public ResponseResult<Object> exitActivity(@NotBlank(message = "活动id不能为空") @PathVariable("activityId") String activityId, HttpServletRequest request) throws ApiException {
+        String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
+        activitiesService.exitActivity(activityId,uid);
+        return ResponseResult.ok("退出成功",null);
     }
 
     @GetMapping("/users")

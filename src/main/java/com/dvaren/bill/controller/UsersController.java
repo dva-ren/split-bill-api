@@ -28,15 +28,9 @@ public class UsersController {
     @Validated
     @IgnoreAuth
     @PostMapping("/login")
-    public ResponseResult<Object> login(@RequestBody UserLoginVo userVo, HttpServletRequest request) throws ApiException {
-        String token = request.getHeader(SystemConstants.ACCESS_TOKEN);
-        Users user;
-        if(TextUtil.isEmpty(token)){
-            user = usersService.register(userVo);
-        }
-        else{
-            user = usersService.login(request);
-        }
+    public ResponseResult<Object> login(@RequestBody UserLoginVo userVo) throws ApiException {
+        Users user = usersService.login(userVo);
+
         // 生成token
         Map<String, String> payload = new HashMap<>();
         payload.put("id",user.getId());

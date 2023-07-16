@@ -24,4 +24,6 @@ public interface ActivitiesService extends IService<Activities> {
     void dissolutionActivity(String activityId, String uid) throws ApiException;
 
     List<Activities> getsActivities(String uid);
+
+    void exitActivity(String activityId ,String uid) throws ApiException;
 }

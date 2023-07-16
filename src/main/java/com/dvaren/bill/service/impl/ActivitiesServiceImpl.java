@@ -95,6 +95,7 @@ public class ActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Activit
      */
     @Override
     public void dissolutionActivity(String activityId, String uid) throws ApiException {
+        System.out.println(activityId);
         Activities activities = activitiesMapper.selectById(activityId);
         if(activities == null){
             throw new ApiException("活动不存在");
@@ -114,6 +115,16 @@ public class ActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Activit
     public List<Activities> getsActivities(String uid) {
 
         return null;
+    }
+
+    @Override
+    public void exitActivity(String activityId, String uid) throws ApiException {
+        int delete = participantsMapper.delete(new LambdaQueryWrapper<ActivityParticipants>()
+                .eq(ActivityParticipants::getActivityId, activityId)
+                .eq(ActivityParticipants::getUserId, uid));
+        if(delete < 0){
+            throw new ApiException("操作失败");
+        }
     }
 
     /**

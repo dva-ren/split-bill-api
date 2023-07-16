@@ -20,7 +20,7 @@ public interface UsersService extends IService<Users> {
 
     Users queryUserById(String uid) throws ApiException;
 
-    Users login(HttpServletRequest request) throws ApiException;
+    Users login(UserLoginVo userVo) throws ApiException;
 
     Users register(UserLoginVo userLoginVo) throws ApiException;
 
