@@ -1,12 +1,11 @@
 package com.dvaren.bill.config;
 
-import com.sun.istack.internal.NotNull;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.HandlerInterceptor;
 
-import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.validation.constraints.NotNull;
 
 /***
  * 拦截器：验证用户是否登录

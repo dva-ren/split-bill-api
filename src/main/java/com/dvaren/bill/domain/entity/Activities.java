@@ -4,6 +4,8 @@ import com.baomidou.mybatisplus.annotation.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
+
 import lombok.Data;
 
 import javax.validation.constraints.NotBlank;
@@ -37,6 +39,12 @@ public class Activities implements Serializable {
      */
     @NotBlank(message = "活动名称不能为空")
     private String name;
+
+    /**
+     * 活动参与者列表
+     */
+    @TableField(exist = false)
+    List<ActivityParticipants> participants;
 
     /**
      * 创建时间

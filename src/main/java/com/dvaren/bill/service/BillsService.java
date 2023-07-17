@@ -3,6 +3,7 @@ package com.dvaren.bill.service;
 import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.constants.SystemConstants;
 import com.dvaren.bill.domain.dto.BillInfoDto;
+import com.dvaren.bill.domain.dto.BillTotalDto;
 import com.dvaren.bill.domain.entity.Bills;
 import com.baomidou.mybatisplus.extension.service.IService;
 import org.springframework.stereotype.Service;
@@ -38,4 +39,6 @@ public interface BillsService extends IService<Bills> {
     Boolean allBillIChecked(String activityId);
 
     List<Bills> queryBills(List<String> billIds);
+
+    BillTotalDto totalMoney(String uid,String activityId);
 }

@@ -10,15 +10,13 @@ import java.math.BigDecimal;
 import java.util.List;
 
 @Data
-public class BillInfoDto implements Serializable {
+public class BillTotalDto implements Serializable {
 
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 
-    private List<Bills> bills;
+    private BigDecimal expend;
 
-    private Users user;
-
-    private BigDecimal totalAmount;
+    private BigDecimal income;
 
 }

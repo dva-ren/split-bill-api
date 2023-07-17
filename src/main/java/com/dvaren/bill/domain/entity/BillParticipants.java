@@ -42,6 +42,11 @@ public class BillParticipants implements Serializable {
     private BigDecimal splitMoney;
 
     /**
+     * 活动ID
+     */
+    private String activityId;
+
+    /**
      * 是否固定金额
      */
     private Integer fixed;

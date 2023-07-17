@@ -5,9 +5,9 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.constants.SystemConstants;
 import com.dvaren.bill.domain.dto.BillInfoDto;
+import com.dvaren.bill.domain.dto.BillTotalDto;
 import com.dvaren.bill.domain.entity.*;
 import com.dvaren.bill.mapper.*;
-import com.dvaren.bill.service.ActivityParticipantsService;
 import com.dvaren.bill.service.BillParticipantsService;
 import com.dvaren.bill.service.BillsService;
 import org.springframework.stereotype.Service;
@@ -74,10 +74,7 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
                         .orderByDesc(Bills::getCreateTime));
         for (Bills bill : bills) {
             bill.setCreator(user);
-            bill.setParticipant(participantsMapper
-                    .selectList(new LambdaQueryWrapper<BillParticipants>()
-                            .eq(BillParticipants::getBillId, bill.getId())
-                            .eq(BillParticipants::getPaid,state)));
+            bill.setParticipant(billParticipantsService.getsBillParticipantList(bill.getId()));
         }
         return bills;
     }
@@ -107,16 +104,13 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
         Map<String, Users> usersMap = new HashMap<>();
         for (String billId : billIds) {
             Bills bill = billsMapper.selectById(billId);
-            List<BillParticipants> billParticipant = participantsMapper
-                    .selectList(new LambdaQueryWrapper<BillParticipants>().eq(BillParticipants::getBillId, billId));
-            for (BillParticipants participants : billParticipant) {
-                Users user = usersMap.get(participants.getUserId());
-                if(user == null){
-                    user = usersMapper.selectById(participants.getUserId());
-                    usersMap.put(participants.getUserId(), user);
-                }
-                participants.setUser(user);
+            List<BillParticipants> billParticipant = billParticipantsService.getsBillParticipantList(billId);
+            Users creator = usersMap.get(bill.getCreatorId());
+            if(creator == null){
+                creator = usersMapper.selectById((bill.getCreatorId()));
+                usersMap.put(bill.getCreatorId(),creator);
             }
+            bill.setCreator(creator);
             bill.setParticipant(billParticipant);
             list.add(bill);
         }
@@ -153,7 +147,10 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
             if(users == null){
                 throw new ApiException("用户不存在->"+userId);
             }
-            ActivityParticipants participants = activityParticipantsMapper.selectOne(new LambdaQueryWrapper<ActivityParticipants>().eq(ActivityParticipants::getActivityId, bill.getActivityId()));
+            ActivityParticipants participants = activityParticipantsMapper
+                    .selectOne(new LambdaQueryWrapper<ActivityParticipants>()
+                            .eq(ActivityParticipants::getActivityId, bill.getActivityId())
+                            .eq(ActivityParticipants::getUserId,userId));
             if(participants == null){
                 throw new ApiException("该成员不在此活动中,id=" + userId);
             }
@@ -163,6 +160,7 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
             // TODO: 分割金额处理   分割可能不均
             billParticipants.setSplitMoney(splitMoney);
             billParticipants.setPayToUserId(bill.getCreatorId());
+            billParticipants.setActivityId(bill.getActivityId());
             participantsMapper.insert(billParticipants);
         }
         return bill;
@@ -255,9 +253,37 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
     public List<Bills> queryBills(List<String> billIds) {
         List<Bills> bills = new ArrayList<>();
         for (String billId : billIds) {
-            bills.add(this.getBill(billId));
+            Bills bill = this.getBill(billId);
+            bill.setParticipant(billParticipantsService.getsBillParticipantList(billId));
+            bills.add(bill);
         }
         return bills;
+    }
+
+    @Override
+    public BillTotalDto totalMoney(String uid, String activityId) {
+        BillTotalDto billTotalDto = new BillTotalDto();
+        List<BillParticipants> billParticipants = participantsMapper
+                .selectList(new LambdaQueryWrapper<BillParticipants>()
+                        .eq(BillParticipants::getUserId, uid)
+                        .eq(BillParticipants::getActivityId, activityId)
+                        .eq(BillParticipants::getPaid,SystemConstants.UN_PAID));
+        BigDecimal expend = new BigDecimal("0.00");
+        for (BillParticipants billParticipant : billParticipants) {
+            expend = expend.add(billParticipant.getSplitMoney());
+        }
+        List<BillParticipants> incomeBills = participantsMapper
+                .selectList(new LambdaQueryWrapper<BillParticipants>()
+                        .eq(BillParticipants::getPayToUserId, uid)
+                        .eq(BillParticipants::getActivityId, activityId)
+                        .eq(BillParticipants::getPaid,SystemConstants.UN_PAID));
+        BigDecimal income = new BigDecimal("0.00");
+        for (BillParticipants billParticipant : incomeBills) {
+            income = income.add(billParticipant.getSplitMoney());
+        }
+        billTotalDto.setExpend(expend);
+        billTotalDto.setIncome(income);
+        return billTotalDto;
     }
 
     /**

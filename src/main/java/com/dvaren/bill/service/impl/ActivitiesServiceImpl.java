@@ -61,20 +61,13 @@ public class ActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Activit
      */
     @Override
     public List<Activities> getsJoinActivities(String uid) {
-        Map<String, Users> usersMap = new HashMap<>();
         List<ActivityParticipants> activityParticipants = participantsMapper.selectList(new LambdaQueryWrapper<ActivityParticipants>().eq(ActivityParticipants::getUserId, uid));
         List<Activities> activities = new ArrayList<>();
         for (ActivityParticipants participants : activityParticipants) {
             Activities activity = activitiesMapper.selectById(participants.getActivityId());
-            String creatorId = activity.getCreatorId();
-            Users user = usersMap.get(creatorId);
-            if(user == null){
-                user = usersMapper.selectById(creatorId);
-                usersMap.put(creatorId,user);
-            }
-            activity.setCreator(user);
             activities.add(activity);
         }
+        this.setCreator(activities);
         return activities;
     }
 
@@ -138,8 +131,18 @@ public class ActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Activit
             Users user = usersMap.get(activity.getCreatorId());
             if(user == null){
                 user = usersMapper.selectById(activity.getCreatorId());
-                usersMap.put(activity.getId(),user);
+                usersMap.put(activity.getCreatorId(),user);
             }
+            List<ActivityParticipants> participantsList = participantsMapper.selectList(new LambdaQueryWrapper<ActivityParticipants>().eq(ActivityParticipants::getActivityId, activity.getId()));
+            for (ActivityParticipants participants : participantsList) {
+                Users partUser = usersMap.get(participants.getUserId());
+                if(partUser == null){
+                    partUser = usersMapper.selectById(participants.getUserId());
+                    usersMap.put(participants.getUserId(),partUser);
+                }
+                participants.setUser(partUser);
+            }
+            activity.setParticipants(participantsList);
             activity.setCreator(user);
         }
         return activities;

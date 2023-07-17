@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
 /**
@@ -40,6 +41,7 @@ public class Bills implements Serializable {
     /**
      * 账单时间
      */
+    @JsonFormat(locale = "zh",timezone = "GMT+8", pattern = "yyyy-MM-dd")
     private Date date;
 
     /**

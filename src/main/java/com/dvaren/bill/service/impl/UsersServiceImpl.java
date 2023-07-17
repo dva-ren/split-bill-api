@@ -89,7 +89,7 @@ public class UsersServiceImpl extends ServiceImpl<UsersMapper, Users>
 
     @Override
     public Users updateUser(Users user) throws ApiException {
-        if(!TextUtil.containEmptyValue(Arrays.asList(user.getNickname(),user.getAvatar(),user.getId()))){
+        if(TextUtil.containEmptyValue(Arrays.asList(user.getNickname(),user.getAvatar(),user.getId()))){
             throw new ApiException("参数错误");
         }
         usersMapper.updateById(user);

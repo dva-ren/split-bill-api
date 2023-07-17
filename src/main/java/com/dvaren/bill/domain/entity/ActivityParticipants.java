@@ -28,7 +28,6 @@ public class ActivityParticipants implements Serializable {
      * 用户ID
      */
     private String userId;
-
     /**
      * 用户信息
      */

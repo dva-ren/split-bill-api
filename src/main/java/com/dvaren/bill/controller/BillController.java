@@ -3,6 +3,7 @@ package com.dvaren.bill.controller;
 import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.constants.SystemConstants;
 import com.dvaren.bill.domain.dto.BillInfoDto;
+import com.dvaren.bill.domain.dto.BillTotalDto;
 import com.dvaren.bill.domain.entity.Bills;
 import com.dvaren.bill.service.BillParticipantsService;
 import com.dvaren.bill.service.BillsService;
@@ -13,6 +14,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -70,14 +72,27 @@ public class BillController {
     }
 
     @PostMapping("/checkout")
-    public ResponseResult<Object> bill(@RequestParam("ids")List<String> ids, HttpServletRequest request) throws ApiException {
+    public ResponseResult<Object> bill(@RequestBody Map<String, List<String>> map, HttpServletRequest request) throws ApiException {
         // String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
-        participantsService.checkoutBills(ids);
+        participantsService.checkoutBills(map.get("ids"));
         return ResponseResult.ok("结算成功",null);
     }
+
     @GetMapping("/query")
     public ResponseResult<Object> queryBills(@RequestParam("ids")List<String> ids) throws ApiException {
         List<Bills> bills = billsService.queryBills(ids);
         return ResponseResult.ok(bills);
+    }
+
+    @GetMapping("/totalMoney")
+    public ResponseResult<Object> totalMoney(@RequestParam("activityId")String activityId, HttpServletRequest request) throws ApiException {
+        String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
+        return ResponseResult.ok(billsService.totalMoney(uid, activityId));
+    }
+
+    @GetMapping("/created")
+    public ResponseResult<Object> createdBills(@RequestParam("activityId")String activityId, HttpServletRequest request) throws ApiException {
+        String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
+        return ResponseResult.ok(billsService.getCreatedBills(uid, activityId, SystemConstants.UN_PAID));
     }
 }
