@@ -10,7 +10,7 @@ Target Server Type    : MYSQL
 Target Server Version : 80023
 File Encoding         : 65001
 
-Date: 2023-07-12 16:43:43
+Date: 2023-07-18 13:58:55
 */
 
 SET FOREIGN_KEY_CHECKS=0;
@@ -53,23 +53,9 @@ CREATE TABLE `bills` (
   `category` varchar(255) NOT NULL COMMENT '账单分类',
   `remark` varchar(255) DEFAULT NULL COMMENT '账单备注',
   `creator_id` varchar(100) NOT NULL COMMENT '创建人ID',
+  `date` datetime DEFAULT NULL,
   `activity_id` varchar(100) NOT NULL COMMENT '活动ID',
   `description` varchar(255) DEFAULT NULL COMMENT '账单描述',
-  `create_time` datetime DEFAULT NULL COMMENT '创建时间',
-  `update_time` datetime DEFAULT NULL COMMENT '更新时间',
-  `is_delete` int NOT NULL DEFAULT '0' COMMENT '逻辑删除字段(0正常 1删除)',
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
-
--- ----------------------------
--- Table structure for bill_items
--- ----------------------------
-DROP TABLE IF EXISTS `bill_items`;
-CREATE TABLE `bill_items` (
-  `id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL,
-  `bill_id` varchar(100) NOT NULL COMMENT '账单ID',
-  `title` varchar(255) DEFAULT NULL COMMENT '账单名称',
-  `money` decimal(10,2) NOT NULL COMMENT '账单金额',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
   `update_time` datetime DEFAULT NULL COMMENT '更新时间',
   `is_delete` int NOT NULL DEFAULT '0' COMMENT '逻辑删除字段(0正常 1删除)',
@@ -86,6 +72,7 @@ CREATE TABLE `bill_participants` (
   `user_id` varchar(100) NOT NULL COMMENT '用户ID',
   `pay_to_user_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '支付给用户ID',
   `split_money` decimal(10,2) NOT NULL COMMENT '分摊金额',
+  `activity_id` varchar(100) CHARACTER SET utf8mb4 COLLATE utf8mb4_0900_ai_ci NOT NULL COMMENT '活动id',
   `fixed` int NOT NULL DEFAULT '1' COMMENT '是否固定金额',
   `paid` int NOT NULL DEFAULT '0' COMMENT '是否已支付',
   `create_time` datetime DEFAULT NULL COMMENT '创建时间',
