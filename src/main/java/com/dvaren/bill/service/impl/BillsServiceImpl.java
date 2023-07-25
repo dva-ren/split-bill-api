@@ -182,7 +182,6 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
             billParticipants.setSplitMoney(splitMoney);
             billParticipants.setPayToUserId(bill.getCreatorId());
             billParticipants.setActivityId(bill.getActivityId());
-            System.out.println(billParticipants);
             participantsMapper.insert(billParticipants);
         }
     }
