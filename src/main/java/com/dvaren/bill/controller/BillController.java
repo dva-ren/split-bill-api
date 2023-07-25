@@ -95,4 +95,34 @@ public class BillController {
         String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
         return ResponseResult.ok(billsService.getCreatedBills(uid, activityId, SystemConstants.UN_PAID));
     }
+
+    @PostMapping("/update")
+    public ResponseResult<Object> updateBill(@RequestBody Bills billForm,HttpServletRequest request) throws ApiException {
+        String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
+        Bills bill = billsService.getBill(billForm.getId());
+        if(bill == null){
+            throw new ApiException("账单不存在");
+        }
+        if(!bill.getCreatorId().equals(uid)){
+            throw new ApiException("权限不足");
+        }
+        billForm.setCreatorId(bill.getCreatorId());
+        billForm.setActivityId(bill.getActivityId());
+        billsService.updateBill(billForm);
+        return ResponseResult.ok("更新成功",null);
+    }
+
+    @PostMapping("/delete/{id}")
+    public ResponseResult<Object> deleteBill(@PathVariable("id") String id, HttpServletRequest request) throws ApiException {
+        String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
+        Bills bill = billsService.getBill(id);
+        if(bill == null){
+            throw new ApiException("账单不存在");
+        }
+        if(!bill.getCreatorId().equals(uid)){
+            throw new ApiException("权限不足");
+        }
+        billsService.deleteBill(id);
+        return ResponseResult.ok("删除成功",null);
+    }
 }

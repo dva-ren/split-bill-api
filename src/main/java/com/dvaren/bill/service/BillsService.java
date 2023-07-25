@@ -18,7 +18,7 @@ import java.util.List;
 @Service
 public interface BillsService extends IService<Bills> {
 
-    Bills getBill(String billId);
+    Bills getBill(String billId) throws ApiException;
 
     List<Bills> getCreatedBills(String uid, String activityId, Integer state);
 
@@ -38,7 +38,7 @@ public interface BillsService extends IService<Bills> {
 
     Boolean allBillIChecked(String activityId);
 
-    List<Bills> queryBills(List<String> billIds);
+    List<Bills> queryBills(List<String> billIds) throws ApiException;
 
     BillTotalDto totalMoney(String uid,String activityId);
 }

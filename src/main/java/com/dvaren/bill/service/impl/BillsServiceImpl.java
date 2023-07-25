@@ -10,6 +10,7 @@ import com.dvaren.bill.domain.entity.*;
 import com.dvaren.bill.mapper.*;
 import com.dvaren.bill.service.BillParticipantsService;
 import com.dvaren.bill.service.BillsService;
+import com.dvaren.bill.utils.TextUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -52,8 +53,11 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
      * @return 账单信息
      */
     @Override
-    public Bills getBill(String billId) {
+    public Bills getBill(String billId) throws ApiException {
         Bills bills = billsMapper.selectById(billId);
+        if(bills == null){
+            throw new ApiException("账单不存在");
+        }
         bills.setCreator(usersMapper.selectById(bills.getCreatorId()));
         bills.setParticipant(billParticipantsService.getsBillParticipantList(billId));
         return bills;
@@ -86,7 +90,7 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
      */
     @Override
     public List<Bills> getAboutMeBills(String uid, String activityId, Integer state) {
-        // TODO: 逻辑有问题
+        // TODO: 逻辑可能有问题
         List<Bills> list = new ArrayList<>();
         List<String> billIds = new ArrayList<>();
 
@@ -133,9 +137,26 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
         }
         billsMapper.insert(bill);
         // TODO: 还需要处理参与者信息
+        createParticipants(bill);
+        return bill;
+    }
+
+    /**
+     * 创建参与者记录
+     * @param bill 账单实体
+     * @throws ApiException 创建出错
+     */
+    private void createParticipants(Bills bill) throws ApiException {
+        if(TextUtil.isEmpty(bill.getActivityId())){
+            throw new ApiException("活动id不能为空");
+        }
+        Activities activities = activitiesMapper.selectById(bill.getActivityId());
+        if(activities == null){
+            throw new ApiException("活动不存在");
+        }
         List<String> participantIds = bill.getParticipantIds();
         if(participantIds == null || participantIds.size() == 0){
-            throw new ApiException("participant参数错误");
+            throw new ApiException("participantIds参数错误");
         }
         BigDecimal len = new BigDecimal(bill.getParticipantIds().size());
         BigDecimal splitMoney = bill.getMoney().divide(len, RoundingMode.CEILING);
@@ -161,9 +182,9 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
             billParticipants.setSplitMoney(splitMoney);
             billParticipants.setPayToUserId(bill.getCreatorId());
             billParticipants.setActivityId(bill.getActivityId());
+            System.out.println(billParticipants);
             participantsMapper.insert(billParticipants);
         }
-        return bill;
     }
 
     /**
@@ -173,11 +194,23 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
      * @throws ApiException api异常
      */
     @Override
+    @Transactional(rollbackFor = {ApiException.class})
     public Bills updateBill(Bills bill) throws ApiException {
-        int i = billsMapper.updateById(bill);
-        if(i < 0){
-            throw new ApiException("未更新");
+        if(TextUtil.isEmpty(bill.getId())){
+            throw new ApiException("参数错误");
         }
+        List<BillParticipants> billParticipants = billParticipantsService.getsBillParticipantList(bill.getId());
+        // TODO: 处理参与者以及金额变化
+        for (BillParticipants billParticipant : billParticipants) {
+            if(Objects.equals(billParticipant.getPaid(), SystemConstants.PAID)){
+                throw new ApiException("当前账单已被结算过");
+            }
+        }
+        // 删除原有参与者记录
+        participantsMapper.delete(new LambdaQueryWrapper<BillParticipants>().eq(BillParticipants::getBillId,bill.getId()));
+        // 创建参与者记录
+        createParticipants(bill);
+        billsMapper.updateById(bill);
         return bill;
     }
 
@@ -187,11 +220,19 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
      * @throws ApiException api异常
      */
     @Override
+    @Transactional(rollbackFor = {ApiException.class})
     public void deleteBill(String id) throws ApiException {
-        int i = billsMapper.deleteById(id);
-        if(i < 0){
-            throw new ApiException("未更新");
+        Bills bill = billsMapper.selectById(id);
+        if(bill == null){
+            throw new ApiException("账单不存在");
         }
+        for (BillParticipants billParticipant : billParticipantsService.getsBillParticipantList(id)) {
+            if(billParticipant.getPaid().equals(SystemConstants.PAID)){
+                throw new ApiException("当前账单已被结算过");
+            }
+            participantsMapper.deleteById(billParticipant.getId());
+        }
+        billsMapper.deleteById(id);
     }
 
     /**
@@ -250,7 +291,7 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
     }
 
     @Override
-    public List<Bills> queryBills(List<String> billIds) {
+    public List<Bills> queryBills(List<String> billIds) throws ApiException {
         List<Bills> bills = new ArrayList<>();
         for (String billId : billIds) {
             Bills bill = this.getBill(billId);

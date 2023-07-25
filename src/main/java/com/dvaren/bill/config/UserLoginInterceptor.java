@@ -5,6 +5,7 @@ import com.auth0.jwt.exceptions.SignatureVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import com.dvaren.bill.Annotation.IgnoreAuth;
 import com.dvaren.bill.constants.SystemConstants;
+import com.dvaren.bill.domain.entity.Users;
 import com.dvaren.bill.service.UsersService;
 import com.dvaren.bill.utils.JWTUtil;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -58,7 +59,6 @@ public class UserLoginInterceptor implements HandlerInterceptor {
         try {
             //验证令牌
             JWTUtil.verify(token);
-            return true;
             //token有效，有NeedPermission注解，则需要验证权限
 //            if (needPermission != null) {
 //                Users userInfo = userService.queryUserById(JWTUtil.getUid(token));
@@ -71,6 +71,11 @@ public class UserLoginInterceptor implements HandlerInterceptor {
 //            }else{
 //                return true;
 //            }
+            Users user = userService.queryUserById(JWTUtil.getUid(token));
+            if(user == null){
+                throw new ApiException("用户不存在");
+            }
+            return true;
         } catch (SignatureVerificationException e) {
             map.put("msg", "无效签名!");
             logger.info("无效签名!");
@@ -83,9 +88,12 @@ public class UserLoginInterceptor implements HandlerInterceptor {
         } catch (Exception e) {
             map.put("msg", "token无效!!");
             logger.info("token无效!!");
+        } catch (ApiException e) {
+            map.put("msg", "用户信息错误");
+            logger.info("用户信息错误");
         }
 
-        Res rs = new Res(400, map.get("msg"));
+        Res rs = new Res(401, map.get("msg"));
         String json = new ObjectMapper().writeValueAsString(rs);
         response.setContentType("application/json;charset=UTF-8");
         response.getWriter().println(json);
