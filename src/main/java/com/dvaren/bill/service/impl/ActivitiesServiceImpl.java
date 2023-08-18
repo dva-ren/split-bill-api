@@ -6,11 +6,14 @@ import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.domain.entity.Activities;
 import com.dvaren.bill.domain.entity.ActivityParticipants;
 import com.dvaren.bill.domain.entity.Users;
+import com.dvaren.bill.enums.StatusCodeEnum;
 import com.dvaren.bill.mapper.ActivityParticipantsMapper;
 import com.dvaren.bill.mapper.UsersMapper;
 import com.dvaren.bill.service.ActivitiesService;
 import com.dvaren.bill.mapper.ActivitiesMapper;
+import com.dvaren.bill.service.ActivityParticipantsService;
 import com.dvaren.bill.service.BillsService;
+import com.dvaren.bill.utils.TextUtil;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,6 +39,9 @@ public class ActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Activit
     private UsersMapper usersMapper;
 
     @Resource
+    private ActivityParticipantsService activityParticipantsService;
+
+    @Resource
     private BillsService billsService;
 
     /**
@@ -51,6 +57,19 @@ public class ActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Activit
         activityParticipants.setActivityId(activities.getId());
         activityParticipants.setUserId(activities.getCreatorId());
         participantsMapper.insert(activityParticipants);
+        return activities;
+    }
+
+    @Override
+    public Activities queryActivity(String activityId) throws ApiException {
+        if(TextUtil.isEmpty(activityId)){
+            throw new ApiException(StatusCodeEnum.ARGUMENTS_ERROR);
+        }
+        Activities activities = activitiesMapper.selectById(activityId);
+        if(activities == null){
+            throw new ApiException("该活动不存在");
+        }
+        activities.setParticipants(activityParticipantsService.getParticipant(activityId));
         return activities;
     }
 

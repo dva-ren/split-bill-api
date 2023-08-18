@@ -38,6 +38,11 @@ public class ActivitiesController {
         return ResponseResult.ok(activity);
     }
 
+    @GetMapping("/{id}")
+    public ResponseResult<Activities> activity(@PathVariable("id") String id) throws ApiException {
+        return ResponseResult.ok(activitiesService.queryActivity(id));
+    }
+
     @GetMapping("/detail")
     public ResponseResult<Map<String, List<Activities>>> list(HttpServletRequest request) throws ApiException {
         String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));

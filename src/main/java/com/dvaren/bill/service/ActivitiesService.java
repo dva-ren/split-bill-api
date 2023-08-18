@@ -17,6 +17,8 @@ public interface ActivitiesService extends IService<Activities> {
 
     Activities createActivity(Activities activities);
 
+    Activities queryActivity(String activityId) throws ApiException;
+
     List<Activities> getsTheCreatedActivities(String uid);
 
     List<Activities> getsJoinActivities(String uid);
