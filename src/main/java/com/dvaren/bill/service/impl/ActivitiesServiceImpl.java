@@ -69,6 +69,7 @@ public class ActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Activit
         if(activities == null){
             throw new ApiException("该活动不存在");
         }
+        activities.setCreator(usersMapper.selectById(activities.getCreatorId()));
         activities.setParticipants(activityParticipantsService.getParticipant(activityId));
         return activities;
     }
