@@ -38,6 +38,15 @@ public class BillController {
         if(uid.isEmpty()){
           uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
         }
+        List<Bills> allBills = billsService.getAllBills(uid, activityId, SystemConstants.UN_PAID);
+        return ResponseResult.ok(allBills);
+    }
+
+    @GetMapping("/aboutMe")
+    public ResponseResult<List<Bills>> aboutMeBills(
+            @RequestParam(value = "activityId",defaultValue = "") String activityId,
+            HttpServletRequest request) throws ApiException {
+        String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
         List<Bills> aboutMeBills = billsService.getAboutMeBills(uid, activityId, SystemConstants.UN_PAID);
         return ResponseResult.ok(aboutMeBills);
     }

@@ -24,6 +24,8 @@ public interface BillsService extends IService<Bills> {
 
     List<Bills> getAboutMeBills(String uid, String activityId, Integer state);
 
+    List<Bills> getAllBills(String uid, String activityId, Integer state);
+
     Bills createBill(Bills bill) throws ApiException;
 
     Bills updateBill(Bills bill) throws ApiException;

@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
+import com.dvaren.bill.constants.BillType;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.Data;
 
@@ -77,6 +78,12 @@ public class Bills implements Serializable {
      * 账单描述
      */
     private String description;
+
+    /**
+     * 账单类型(收入或支出)
+     */
+    @TableField(exist = false)
+    private BillType type;
 
     /**
      * 创建时间

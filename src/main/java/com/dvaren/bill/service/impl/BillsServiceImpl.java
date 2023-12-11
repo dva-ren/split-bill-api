@@ -3,6 +3,7 @@ package com.dvaren.bill.service.impl;
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.dvaren.bill.config.ApiException;
+import com.dvaren.bill.constants.BillType;
 import com.dvaren.bill.constants.SystemConstants;
 import com.dvaren.bill.domain.dto.BillInfoDto;
 import com.dvaren.bill.domain.dto.BillTotalDto;
@@ -18,6 +19,8 @@ import javax.annotation.Resource;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.*;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
 * @author 025
@@ -121,6 +124,23 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
 
         return list;
     }
+
+    @Override
+    public List<Bills> getAllBills(String uid, String activityId, Integer state) {
+        List<Bills> aboutMeBills = this.getAboutMeBills(uid, activityId, state);
+        List<Bills> createdBills = this.getCreatedBills(uid, activityId, state);
+        List<Bills> bills;
+        for (Bills aboutMeBill : aboutMeBills) {
+            aboutMeBill.setType(BillType.EXPEND);
+        }
+        for (Bills createdBill : createdBills) {
+            createdBill.setType(BillType.INCOME);
+        }
+        List<Bills> collect = Stream.concat(aboutMeBills.stream(), createdBills.stream()).collect(Collectors.toList());
+        Collections.sort(collect,(item1,item2)-> item2.getDate().compareTo(item2.getDate()));
+        return collect;
+    }
+
 
     /**
      * 创建账单

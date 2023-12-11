@@ -41,16 +41,16 @@ public class UsersController {
     }
 
     // 测试用
-//    @IgnoreAuth
-//    @GetMapping("/token")
-//    public ResponseResult<Object> token(@RequestParam("id") String uid){
-//        // 生成token
-//        Map<String, String> payload = new HashMap<>();
-//        payload.put("id",uid);
-//        HashMap<String, Object> res = new HashMap<>();
-//        res.put("access_token",JWTUtil.generateToken(payload));
-//        return ResponseResult.ok(res);
-//    }
+    @IgnoreAuth
+    @GetMapping("/token")
+    public ResponseResult<Object> token(@RequestParam("id") String uid){
+        // 生成token
+        Map<String, String> payload = new HashMap<>();
+        payload.put("id",uid);
+        HashMap<String, Object> res = new HashMap<>();
+        res.put("access_token",JWTUtil.generateToken(payload));
+        return ResponseResult.ok(res);
+    }
 
     @GetMapping
     public ResponseResult<Object> userInfo(@RequestParam(value = "id", defaultValue = "")String uid, HttpServletRequest request) throws ApiException {
