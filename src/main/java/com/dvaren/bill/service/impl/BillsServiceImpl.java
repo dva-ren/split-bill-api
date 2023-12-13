@@ -129,16 +129,13 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
     public List<Bills> getAllBills(String uid, String activityId, Integer state) {
         List<Bills> aboutMeBills = this.getAboutMeBills(uid, activityId, state);
         List<Bills> createdBills = this.getCreatedBills(uid, activityId, state);
-        List<Bills> bills;
         for (Bills aboutMeBill : aboutMeBills) {
             aboutMeBill.setType(BillType.EXPEND);
         }
         for (Bills createdBill : createdBills) {
             createdBill.setType(BillType.INCOME);
         }
-        List<Bills> collect = Stream.concat(aboutMeBills.stream(), createdBills.stream()).collect(Collectors.toList());
-        Collections.sort(collect,(item1,item2)-> item2.getDate().compareTo(item2.getDate()));
-        return collect;
+        return Stream.concat(aboutMeBills.stream(), createdBills.stream()).sorted((item1, item2) -> item2.getCreateTime().compareTo(item1.getCreateTime())).collect(Collectors.toList());
     }
 
 
