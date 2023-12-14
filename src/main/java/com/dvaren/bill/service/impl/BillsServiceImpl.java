@@ -276,7 +276,7 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
     @Override
     public List<BillInfoDto> getIncomeTotalMoney(String uid, String activityId, Integer state) {
         List<Bills> createdBills = this.getCreatedBills(uid, activityId,state);
-        return this.toBillInfoDto(createdBills,state);
+        return this.toBillInfoDto(createdBills,BillType.INCOME);
     }
 
     /**
@@ -288,7 +288,7 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
     @Override
     public List<BillInfoDto> getExpendTotalMoney(String uid, String activityId, Integer state) {
         List<Bills> aboutMeBills = this.getAboutMeBills(uid, activityId,state);
-        return this.toBillInfoDto(aboutMeBills,state);
+        return this.toBillInfoDto(aboutMeBills, BillType.EXPEND);
     }
 
     @Override
@@ -348,31 +348,46 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
      * @param billsList 账单列表
      * @return 结果数组
      */
-    public List<BillInfoDto> toBillInfoDto(List<Bills> billsList, Integer state){
+    public List<BillInfoDto> toBillInfoDto(List<Bills> billsList, BillType type){
         Map<Users, BigDecimal> decimalMap = new HashMap<>();
         Map<String, Users> usersMap = new HashMap<>();
         Map<String, List<Bills>> userBillMap = new HashMap<>();
-
-        for (Bills bill : billsList) {
-            List<BillParticipants> billParticipants = participantsMapper.selectList(new LambdaQueryWrapper<BillParticipants>()
-                    .eq(BillParticipants::getBillId, bill.getId())
-                    .eq(BillParticipants::getPaid, state));
-            for (BillParticipants billParticipant : billParticipants) {
-                Users user = usersMap.get(billParticipant.getUserId());
-                if(user == null){
-                    user = usersMapper.selectById(billParticipant.getUserId());
-                    usersMap.put(billParticipant.getUserId(), user);
+        if (type == BillType.INCOME){
+            for (Bills bill : billsList) {
+                for (BillParticipants billParticipant : bill.getParticipant()) {
+                    Users user = usersMap.get(billParticipant.getUserId());
+                    if(user == null){
+                        user = usersMapper.selectById(billParticipant.getUserId());
+                        usersMap.put(billParticipant.getUserId(), user);
+                    }
+                    BigDecimal bigDecimal = decimalMap.get(user);
+                    if(bigDecimal == null){
+                        bigDecimal = billParticipant.getSplitMoney();
+                        decimalMap.put(user, bigDecimal);
+                    }
+                    else{
+                        bigDecimal = bigDecimal.add(billParticipant.getSplitMoney());
+                    }
+                    decimalMap.put(user,bigDecimal);
+                    List<Bills> bills = userBillMap.computeIfAbsent(billParticipant.getUserId(), k -> new ArrayList<>());
+                    bills.add(bill);
                 }
+            }
+        }
+        else if(type == BillType.EXPEND) {
+            for (Bills bill : billsList) {
+                Users user = usersMap.computeIfAbsent(bill.getCreatorId(), k -> bill.getCreator());
                 BigDecimal bigDecimal = decimalMap.get(user);
                 if(bigDecimal == null){
-                    bigDecimal = billParticipant.getSplitMoney();
+                    bigDecimal = bill.getParticipant().get(0).getSplitMoney();
                     decimalMap.put(user, bigDecimal);
                 }
                 else{
-                    bigDecimal = bigDecimal.add(billParticipant.getSplitMoney());
+                    bigDecimal = bigDecimal.add(bill.getParticipant().get(0).getSplitMoney());
                 }
                 decimalMap.put(user,bigDecimal);
-                List<Bills> bills = userBillMap.computeIfAbsent(billParticipant.getUserId(), k -> new ArrayList<>());
+                usersMap.computeIfAbsent(bill.getCreatorId(), k -> bill.getCreator());
+                List<Bills> bills = userBillMap.computeIfAbsent(bill.getCreatorId(), k -> new ArrayList<>());
                 bills.add(bill);
             }
         }
