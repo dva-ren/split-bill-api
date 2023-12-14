@@ -31,7 +31,10 @@ mybatis-plus:
 weixin:
   appid: ${APPID}
   secret: ${SECRET}
-
+upload:
+  file-path: D:/images/
+  domain: "https://bill.dvaren.xyz/static"
+  max-size: 500
 # 分页配置
 #pagehelper:
 #  helper-dialect: mysql

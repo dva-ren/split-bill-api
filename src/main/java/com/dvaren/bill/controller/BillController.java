@@ -3,7 +3,6 @@ package com.dvaren.bill.controller;
 import com.dvaren.bill.config.ApiException;
 import com.dvaren.bill.constants.SystemConstants;
 import com.dvaren.bill.domain.dto.BillInfoDto;
-import com.dvaren.bill.domain.dto.BillTotalDto;
 import com.dvaren.bill.domain.entity.Bills;
 import com.dvaren.bill.service.BillParticipantsService;
 import com.dvaren.bill.service.BillsService;
@@ -14,7 +13,6 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
-import java.lang.reflect.Array;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
