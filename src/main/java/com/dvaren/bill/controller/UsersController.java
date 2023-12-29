@@ -43,7 +43,10 @@ public class UsersController {
     // 测试用
 //    @IgnoreAuth
 //    @GetMapping("/token")
-//    public ResponseResult<Object> token(@RequestParam("id") String uid){
+//    public ResponseResult<Object> token(@RequestParam("id") String uid) throws ApiException {
+//        if(TextUtil.isEmpty(uid)){
+//            throw new ApiException("id不能为空");
+//        }
 //        // 生成token
 //        Map<String, String> payload = new HashMap<>();
 //        payload.put("id",uid);

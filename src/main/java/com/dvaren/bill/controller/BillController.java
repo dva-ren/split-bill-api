@@ -62,6 +62,9 @@ public class BillController {
                 @RequestParam(value = "activityId",defaultValue = "") String activityId,
             @RequestParam(value = "type",defaultValue = "") String type,
             HttpServletRequest request) throws ApiException {
+        if (TextUtil.isEmpty(activityId)){
+            throw new ApiException("activityId不能为空");
+        }
         Object res = null;
         String uid = JWTUtil.getUid(request.getHeader(SystemConstants.ACCESS_TOKEN));
         if(TextUtil.isEmpty(type)){

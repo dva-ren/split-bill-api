@@ -89,8 +89,8 @@ public class UserLoginInterceptor implements HandlerInterceptor {
             map.put("msg", "token无效!!");
             logger.info("token无效!!");
         } catch (ApiException e) {
-            map.put("msg", "用户信息错误");
-            logger.info("用户信息错误");
+            map.put("msg", e.getMessage());
+            logger.info(e.getMessage());
         }
 
         Res rs = new Res(401, map.get("msg"));

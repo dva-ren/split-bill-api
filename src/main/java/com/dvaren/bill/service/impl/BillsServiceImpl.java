@@ -355,6 +355,9 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
         if (type == BillType.INCOME){
             for (Bills bill : billsList) {
                 for (BillParticipants billParticipant : bill.getParticipant()) {
+                    if(!Objects.equals(billParticipant.getPaid(), SystemConstants.UN_PAID)){
+                        continue;
+                    }
                     Users user = usersMap.get(billParticipant.getUserId());
                     if(user == null){
                         user = usersMapper.selectById(billParticipant.getUserId());
