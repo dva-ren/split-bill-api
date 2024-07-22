@@ -176,7 +176,8 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
             throw new ApiException("participantIds参数错误");
         }
         BigDecimal len = new BigDecimal(bill.getParticipantIds().size());
-        BigDecimal splitMoney = bill.getMoney().divide(len, RoundingMode.CEILING);
+        // 添加精度计算精度为2
+        BigDecimal splitMoney = bill.getMoney().divide(len, 2,RoundingMode.CEILING);
         for (String userId : bill.getParticipantIds()) {
             if(Objects.equals(bill.getCreatorId(), userId)){
                 continue;

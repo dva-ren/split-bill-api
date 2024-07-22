@@ -29,11 +29,11 @@ mybatis-plus:
       logic-not-delete-value: 0
       id-type: auto
 weixin:
-  appid: ${APPID}
-  secret: ${SECRET}
+  appid: wx2492e9f33bbd9555
+  secret: 9f48f56107ad299241b6a1d34b9e5949
 upload:
   file-path: D:/images/
-  domain: "https://bill.dvaren.xyz/static"
+  domain: "https://bill.dvaren.cn/static"
   max-size: 500
 # 分页配置
 #pagehelper:
