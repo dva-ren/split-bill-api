@@ -39,6 +39,13 @@ public class BillController {
         List<Bills> allBills = billsService.getAllBills(uid, activityId, SystemConstants.UN_PAID);
         return ResponseResult.ok(allBills);
     }
+    @GetMapping("/all")
+    public ResponseResult<List<Bills>> all(
+            @RequestParam(value = "activityId") String activityId
+    ){
+        List<Bills> activityAllBills = billsService.getActivityAllBills(activityId);
+        return ResponseResult.ok(activityAllBills);
+    }
 
     @GetMapping("/aboutMe")
     public ResponseResult<List<Bills>> aboutMeBills(

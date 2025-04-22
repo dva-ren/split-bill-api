@@ -259,12 +259,14 @@ public class BillsServiceImpl extends ServiceImpl<BillsMapper, Bills>
      */
     @Override
     public List<Bills> getActivityAllBills(String activityId) {
-        List<Bills> bills = billsMapper.selectList(new LambdaQueryWrapper<Bills>().eq(Bills::getActivityId, activityId));
+        List<Bills> bills = billsMapper.selectAllBills(activityId);
         for (Bills bill : bills) {
-            List<BillParticipants> billParticipants = participantsMapper.selectList(new LambdaQueryWrapper<BillParticipants>().eq(BillParticipants::getBillId, bill.getId()));
+            List<BillParticipants> billParticipants = participantsMapper.selectAllParticipants(bill.getId());
             for (BillParticipants billParticipant : billParticipants) {
                 billParticipant.setUser(usersMapper.selectById(billParticipant.getUserId()));
             }
+            bill.setParticipant(billParticipants);
+            bill.setCreator(usersMapper.selectById(bill.getCreatorId()));
         }
         return bills;
     }

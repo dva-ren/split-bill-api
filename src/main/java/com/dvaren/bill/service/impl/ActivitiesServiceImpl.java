@@ -141,7 +141,7 @@ public class ActivitiesServiceImpl extends ServiceImpl<ActivitiesMapper, Activit
     }
 
     /**
-     * 查询创建者谢谢
+     * 查询创建者信息
      * @param activities 原始数据
      * @return 添加后的数据
      */
